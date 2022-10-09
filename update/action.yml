@@ -1,0 +1,28 @@
+name: update-submodules
+description: 'Update a submodule'
+inputs:
+  token:
+    description: GitHub token to use for accessing repositories
+    required: false
+    default: ${{ github.token }}
+  submodules:
+    description: Submodule or submodules to update
+    required: false
+    default: ${{ github.event.client_payload.submodules }}
+runs:
+  using: composite
+  steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ inputs.token }}
+        submodules: true
+    - name: Update submodule
+      run: ${{ github.action_path }}/update-submodule.sh ${{ join(inputs.submodules, ' ') }}
+      shell: bash
+    - name: Commit update
+      run: ${{ github.action_path }}/commit.sh ${{ join(inputs.submodules, ' ') }}
+      shell: bash
+    - name: Push update
+      run: git push
+      shell: bash

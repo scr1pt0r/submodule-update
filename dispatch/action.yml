@@ -1,0 +1,27 @@
+name: dispatch-submodule-update
+description: 'Update remote submodule'
+inputs:
+  token:
+    description: GitHub token to use for accessing repositories
+    required: false
+    default: ${{ github.token }}
+  repository:
+    description: Remote repository to update.
+    required: true
+  submodules:
+    description: Submodule or submodules to update
+    required: true
+  event-type:
+    description: Event type to trigger
+    required: false
+    default: update-submodules
+runs:
+  using: composite
+  steps:
+    - name: Dispatch remote submodule update
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.repository }}
+        event-type: ${{ inputs.event-type }}
+        client-payload: '{"submodules": ${{ toJSON(inputs.submodules) }}}'
